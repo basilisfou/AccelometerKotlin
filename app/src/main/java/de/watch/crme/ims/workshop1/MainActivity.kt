@@ -1,50 +1,58 @@
 package de.watch.crme.ims.workshop1
 
-import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import de.watch.crme.ims.workshop1.services.AccelerometerService
+import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), SensorEventListener {
+import android.app.ActivityManager
+import android.content.Context
 
-    private var mSensorManager : SensorManager?= null
-    private var mAccelerometer : Sensor ?= null
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-
-    }
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        if(event != null){
-            Log.d("ACCELEROMETER","${event.values[1]} ${event.values[0]}")
-        }
-    }
+class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        init()
+        initUI()
     }
 
-    private fun init(){
-        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-
-        mAccelerometer = mSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    private fun initUI(){
+        start_accelometer.setOnClickListener { initService() }
     }
 
-    override fun onResume() {
-        super.onResume()
-        mSensorManager!!.registerListener(this,mAccelerometer,
-            SensorManager.SENSOR_DELAY_GAME)
+    private fun initService(){
+        if(isServiceRunning()){
+            val intent = Intent(this, AccelerometerService::class.java)
+            stopService(intent)
+
+            changeNameOfTheButton(false)
+
+        } else {
+            val intent = Intent(this, AccelerometerService::class.java)
+            startService(intent)
+
+            changeNameOfTheButton(true)
+        }
     }
 
-    override fun onPause() {
-        super.onPause()
-        mSensorManager!!.unregisterListener(this)
+    private fun changeNameOfTheButton(startRunning : Boolean){
+        if(startRunning){
+            start_accelometer.text = getString(R.string.stop_accelometer)
+        } else {
+            start_accelometer.text = getString(R.string.start_accelometer)
+        }
+    }
+
+    private fun isServiceRunning() : Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (AccelerometerService::class.java.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 }
