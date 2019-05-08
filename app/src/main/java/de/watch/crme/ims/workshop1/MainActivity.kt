@@ -10,6 +10,8 @@ import android.content.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import de.watch.crme.ims.workshop1.Utils.APP_IS_OPEN_PREFERENCES_KEY
 import de.watch.crme.ims.workshop1.Utils.SHARRED_KEY_PREFERENCES_KEY
+import android.media.MediaPlayer
+import android.view.View
 
 
 class MainActivity : AppCompatActivity(){
@@ -19,7 +21,7 @@ class MainActivity : AppCompatActivity(){
     private val mMessageReceiver = object:  BroadcastReceiver() {
 
         override fun onReceive(context: Context?, intent: Intent?) {
-            changeNameOfTheButton(false)
+            freeFallDetected()
         }
     }
 
@@ -43,12 +45,14 @@ class MainActivity : AppCompatActivity(){
     private fun initService(){
         if(isServiceRunning()){
             val intent = Intent(this, AccelerometerService::class.java)
+
             stopService(intent)
 
             changeNameOfTheButton(false)
 
         } else {
             val intent = Intent(this, AccelerometerService::class.java)
+
             startService(intent)
 
             changeNameOfTheButton(true)
@@ -71,6 +75,19 @@ class MainActivity : AppCompatActivity(){
             }
         }
         return false
+    }
+
+    private fun freeFallDetected(){
+
+        soundTheAlarm()
+
+        start_accelometer.visibility = View.VISIBLE
+
+    }
+
+    private fun soundTheAlarm(){
+        val mp = MediaPlayer.create(this, R.raw.alert)
+        mp.start()
     }
 
     override fun onResume() {
