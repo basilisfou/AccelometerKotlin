@@ -25,7 +25,7 @@ class AccelerometerService : Service(), SensorEventListener {
     private var sharedPref: SharedPreferences? = null
 
     companion object{
-        const val BROADCAST_ACTION = ""
+        const val BROADCAST_ACTION = "broadcast.action."
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
