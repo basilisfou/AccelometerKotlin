@@ -14,6 +14,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import de.watch.crme.ims.workshop1.Utils.APP_IS_OPEN_PREFERENCES_KEY
 import de.watch.crme.ims.workshop1.Utils.SHARRED_KEY_PREFERENCES_KEY
 import de.watch.crme.ims.workshop1.MainActivity
+import de.watch.crme.ims.workshop1.Utils.VECTOR_PREFERENCES_KEY
 
 class AccelerometerService : Service(), SensorEventListener {
 
@@ -26,6 +27,8 @@ class AccelerometerService : Service(), SensorEventListener {
         const val BROADCAST_ACTION_ALARM = "broadcast.action.alarm"
 
         const val BROADCAST_ACTION_ACCELEROMETER = "broadcast.action.accelerometer"
+
+        const val THRESHOLD = 0.7
 
     }
 
@@ -66,7 +69,9 @@ class AccelerometerService : Service(), SensorEventListener {
 
             Log.d("ACCELEROMETER"," x: $x , y: $y , z: $z , vector : $mAccel")
 
-            if(mAccel <= 2){
+            notifyVectorChange(mAccel)
+
+            if(mAccel <= THRESHOLD){
 
                 unregisterSesnsorListener()
 
@@ -80,17 +85,24 @@ class AccelerometerService : Service(), SensorEventListener {
         val isOpen = sharedPref?.getBoolean(APP_IS_OPEN_PREFERENCES_KEY, false)
 
         if(isOpen == true){
-            startLocalBroadcastReceiver()
+            notifyAlarmStrat()
         } else {
             openActivity()
         }
     }
 
-    private fun startLocalBroadcastReceiver(){
-        LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(BROADCAST_ACTION_ALARM))
+    private fun notifyAlarmStrat(){
+        val intent = Intent(BROADCAST_ACTION_ALARM)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
+    private fun notifyVectorChange(mAccel : Double){
+        val intent = Intent(BROADCAST_ACTION_ACCELEROMETER).apply {
+            putExtra(VECTOR_PREFERENCES_KEY,mAccel)
+        }
 
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
 
     private fun openActivity(){
         val dialogIntent = Intent(this, MainActivity::class.java)
