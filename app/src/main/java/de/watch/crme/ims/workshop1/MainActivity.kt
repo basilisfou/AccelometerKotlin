@@ -18,12 +18,15 @@ class MainActivity : AppCompatActivity(){
 
     private lateinit var sharedPref: SharedPreferences
 
+    private lateinit var mp : MediaPlayer
+
     private val mMessageReceiver = object:  BroadcastReceiver() {
 
         override fun onReceive(context: Context?, intent: Intent?) {
             freeFallDetected()
         }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,36 +37,23 @@ class MainActivity : AppCompatActivity(){
         sharedPref = getSharedPreferences(SHARRED_KEY_PREFERENCES_KEY, Context.MODE_PRIVATE)
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
-            mMessageReceiver, IntentFilter(AccelerometerService.BROADCAST_ACTION)
+            mMessageReceiver, IntentFilter(AccelerometerService.BROADCAST_ACTION_ALARM)
         )
+
+        mp = MediaPlayer.create(this, R.raw.alert)
     }
 
     private fun initUI(){
+
         start_accelometer.setOnClickListener { initService() }
+
+        stopAccelerometer.setOnClickListener { cancelTheAlarm() }
     }
 
     private fun initService(){
-        if(isServiceRunning()){
+        if(!isServiceRunning()){
             val intent = Intent(this, AccelerometerService::class.java)
-
-            stopService(intent)
-
-            changeNameOfTheButton(false)
-
-        } else {
-            val intent = Intent(this, AccelerometerService::class.java)
-
             startService(intent)
-
-            changeNameOfTheButton(true)
-        }
-    }
-
-    private fun changeNameOfTheButton(startRunning : Boolean){
-        if(startRunning){
-            start_accelometer.text = getString(R.string.stop_accelometer)
-        } else {
-            start_accelometer.text = getString(R.string.start_accelometer)
         }
     }
 
@@ -81,13 +71,27 @@ class MainActivity : AppCompatActivity(){
 
         soundTheAlarm()
 
-        start_accelometer.visibility = View.VISIBLE
+        start_accelometer.visibility = View.GONE
+
+        stopAccelerometer.visibility = View.VISIBLE
 
     }
 
     private fun soundTheAlarm(){
-        val mp = MediaPlayer.create(this, R.raw.alert)
+
         mp.start()
+    }
+
+    private fun cancelTheAlarm(){
+
+        mp.reset()
+
+        start_accelometer.visibility = View.VISIBLE
+
+        stopAccelerometer.visibility = View.GONE
+
+        val intent = Intent(this, AccelerometerService::class.java)
+        stopService(intent)
     }
 
     override fun onResume() {

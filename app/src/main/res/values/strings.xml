@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Workshop1</string>
 
-    <string name="start_accelometer">Start</string>
-    <string name="stop_accelometer">Stop</string>
+    <string name="start_accelometer">Start Accelerometer</string>
+    <string name="stop_accelometer">Stop Accelerometer</string>
+
+    <string name="stop_alarm">Stop Alarm</string>
 </resources>

@@ -15,9 +15,6 @@ import de.watch.crme.ims.workshop1.Utils.APP_IS_OPEN_PREFERENCES_KEY
 import de.watch.crme.ims.workshop1.Utils.SHARRED_KEY_PREFERENCES_KEY
 import de.watch.crme.ims.workshop1.MainActivity
 
-
-
-
 class AccelerometerService : Service(), SensorEventListener {
 
     private var mSensorManager : SensorManager?= null
@@ -25,7 +22,11 @@ class AccelerometerService : Service(), SensorEventListener {
     private var sharedPref: SharedPreferences? = null
 
     companion object{
-        const val BROADCAST_ACTION = "broadcast.action."
+
+        const val BROADCAST_ACTION_ALARM = "broadcast.action.alarm"
+
+        const val BROADCAST_ACTION_ACCELEROMETER = "broadcast.action.accelerometer"
+
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -86,8 +87,10 @@ class AccelerometerService : Service(), SensorEventListener {
     }
 
     private fun startLocalBroadcastReceiver(){
-        LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(BROADCAST_ACTION))
+        LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(BROADCAST_ACTION_ALARM))
     }
+
+
 
     private fun openActivity(){
         val dialogIntent = Intent(this, MainActivity::class.java)
